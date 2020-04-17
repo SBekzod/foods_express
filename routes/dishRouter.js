@@ -15,6 +15,10 @@ dishRouter.route('/')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
+    .put((req, res, next) => {
+        res.statusCode = 403;
+        res.end('Put operation does not make sense');
+    })
     .post((req, res, next) => {
         Dishes.create(req.body)
             .then((dish) => {
@@ -24,11 +28,7 @@ dishRouter.route('/')
                 res.json(dish);
             }, (err) => next(err))
             .catch((err) => next(err));
-    })
-    .put((req, res, next) => {
-        res.statusCode = 403;
-        res.end('Put operation does not make sense');
-    })
+    }) 
     .delete((req, res, next) => {
         Dishes.remove({})
             .then((resp) => {
