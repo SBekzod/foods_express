@@ -1,34 +1,54 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const Dishes = require('../models/dishes');
+
 const dishRouter = express.Router();
 dishRouter.use(bodyParser.json());
 dishRouter.route('/')
-    .all((req, res, next) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        next();
-    })
     .get((req, res, next) => {
-        res.end('Will send all the dishes to you!');
+        Dishes.find({})
+            .then((dishes) => {
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.json(dishes);
+            }, (err) => next(err))
+            .catch((err) => next(err));
     })
     .post((req, res, next) => {
-        res.end('Will add the dishes: ' + req.body.name +
-            ' and dish details: ' + req.body.description);
+        Dishes.create(req.body)
+            .then((dish) => {
+                console.log('Dish created', dish);
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.json(dish);
+            }, (err) => next(err))
+            .catch((err) => next(err));
     })
     .put((req, res, next) => {
         res.statusCode = 403;
         res.end('Put operation does not make sense');
     })
     .delete((req, res, next) => {
-        res.end('Deleting all the dishes');
+        Dishes.remove({})
+            .then((resp) => {
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.json(resp);
+            }, (err) => next(err))
+            .catch((err) => next(err));
     });
 
 
 dishRouter.route('/:id')                   // DAVOMIGA YOZING!
     .get((req, res, next) => {
-        res.end('Will send the information about dishes'
-            + req.params.id + ' to you!');
+        Dishes.findById(req.params.id)
+            .then((dish) => {
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.json(dish);
+            }, (err) => next(err))
+            .catch((err) => next(err));
     })
     .post((req, res, next) => {
         res.statusCode = 403;
@@ -36,12 +56,22 @@ dishRouter.route('/:id')                   // DAVOMIGA YOZING!
             + req.params.id);
     })
     .put((req, res, next) => {
-        res.write('Updating the dish: ' + req.params.id);
-        res.end(' Will update the dish: ' + req.body.name +
-            ' with details: ' + req.body.description);
+        Dishes.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
+            .then((dish) => {
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.json(dish);
+            }, (err) => next(err))
+            .catch((err) => next(err));
     })
     .delete((req, res, next) => {
-        res.end('Deleting the chosen dish: ' + req.params.id);
+        Dishes.findByIdAndRemove(req.params.id)
+            .then((resp) => {
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.json(resp);
+            }, (err) => next(err))
+            .catch((err) => next(err));
     });
 
 

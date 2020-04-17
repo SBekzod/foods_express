@@ -1,19 +1,27 @@
 var createError = require('http-errors');                             //?
-var express = require('express');                                  
-var path = require('path');                                        
+var express = require('express');
+var path = require('path');
 var cookieParser = require('cookie-parser');                          //?
-var logger = require('morgan');                                    
+var logger = require('morgan');
 
-var indexRouter = require('./routes/index');                      
-var usersRouter = require('./routes/users');                       
-var dishRouter = require('./routes/dishRouter');                  
-var leadersRouter = require('./routes/leadersRouter');            
-var promotionRouter = require('./routes/promoRouter');            
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+var dishRouter = require('./routes/dishRouter');
+var leadersRouter = require('./routes/leadersRouter');
+var promotionRouter = require('./routes/promoRouter');
+
+const mongoose = require('mongoose');
+const url = 'mongodb://localhost:27017/conFusion';
+const connect = mongoose.connect(url);
+
+connect.then((db) => {
+  console.log('Connection succeed');
+})
+  .catch((err) => console.log(err));
 
 
 
-var app = express();                                                
-
+var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));                    //?
 app.set('view engine', 'jade');                                     //?
