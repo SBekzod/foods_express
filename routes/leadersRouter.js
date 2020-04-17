@@ -1,47 +1,77 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const Leaders = require('../models/leaders');
+
 const leadersRouter = express.Router();
 leadersRouter.use(bodyParser.json());
 leadersRouter.route('/')
-    .all((req, res, next) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        next();
-    })
     .get((req, res, next) => {
-        res.end('Will send all the leaders to you!');
+        Leaders.find({})
+            .then((leaders) => {
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.json(leaders);
+            }, (err) => next(err))
+            .catch((err) => next(err));
     })
     .post((req, res, next) => {
-        res.end('Will add the leaders: ' + req.body.name +
-            ' and leader details: ' + req.body.description);
+        Leaders.create(req.body)
+            .then((leader) => {
+                console.log('Leader created', leader);
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.json(leader);
+            }, (err) => next(err))
+            .catch((err) => next(err));
     })
     .put((req, res, next) => {
         res.statusCode = 403;
         res.end('Put operation does not make sense');
     })
     .delete((req, res, next) => {
-        res.end('Deleting all the leaders');
+        Leaders.remove({})
+            .then((resp) => {
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.json(resp);
+            }, (err) => next(err))
+            .catch((err) => next(err));
     });
 
 
 leadersRouter.route('/:id')                   // DAVOMIGA YOZING!
     .get((req, res, next) => {
-        res.end('Will send the information about leaders'
-            + req.params.id + ' to you!');
+        Leaders.findById(req.params.id)
+            .then((leader) => {
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.json(leader);
+            }, (err) => next(err))
+            .catch((err) => next(err));
     })
     .post((req, res, next) => {
         res.statusCode = 403;
         res.end('Post operation does not make sense'
             + req.params.id);
     })
-    .put((req, res, next) => {                       
-        res.write('Updating the leader: ' + req.params.id);
-        res.end(' Will update the leader: ' + req.body.name +
-            ' with details: ' + req.body.description);
+    .put((req, res, next) => {
+        Leaders.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
+            .then((leader) => {
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.json(leader);
+            }, (err) => next(err))
+            .catch((err) => next(err));
     })
     .delete((req, res, next) => {
-        res.end('Deleting the chosen leader: ' + req.params.id);
+        Leaders.findByIdAndRemove(req.params.id)
+            .then((resp) => {
+                res.statusCode = 200;
+                res.setHeader('Content-type', 'application/json');
+                res.json(resp);
+            }, (err) => next(err))
+            .catch((err) => next(err));
     });
 
 module.exports = leadersRouter;
