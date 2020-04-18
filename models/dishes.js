@@ -59,6 +59,5 @@ var dishSchema = new Schema({
     timestamps: true
 });
 
-var Dishes = mongoose.model('Dish', dishSchema);
 
-module.exports = Dishes;
+module.exports = mongoose.model('Dish', dishSchema);;
