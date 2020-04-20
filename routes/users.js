@@ -8,8 +8,18 @@ const User = require('../models/user');
 var router = express.Router();
 router.use(bodyParser.json());
 
-router.get('/', (req, res, next) => {
-  res.send('There are lots of information and we are ready to respond with a resource');
+router.get('/', authenticate.verifyUser, (req, res, next) => {
+  if (req.user.admin === true) {
+    User.find({})
+      .then((users) => {
+        res.statusCode = 200;
+        res.setHeader('Content-type', 'application/json');
+        res.json(users);
+      }, (err) => next(err))
+      .catch((err) => next(err));
+  } else {
+    res.send('Only admins can see this page');
+  }
 });
 
 router.post('/signup', (req, res, next) => {
