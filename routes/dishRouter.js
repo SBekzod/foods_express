@@ -7,12 +7,12 @@ const Dishes = require('../models/dishes');
 const dishRouter = express.Router();
 dishRouter.use(bodyParser.json());
 
-dishRouter.route('/')
+dishRouter.route('/') 
     .get((req, res, next) => {
         Dishes.find({})
             .then((dishes) => {
                 res.statusCode = 200;
-                res.setHeader('Content-type', 'application/json');
+                res.setHeader('Content-Type', 'application/json');
                 res.json(dishes);
             }, (err) => next(err))
             .catch((err) => next(err));
