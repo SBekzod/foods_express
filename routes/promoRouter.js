@@ -1,13 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 var authenticate = require('../authenticate');
+const cors = require('./cors');
 
 const Promotions = require('../models/promotions');
 
 const promotionRouter = express.Router();
 promotionRouter.use(bodyParser.json());
 promotionRouter.route('/')
-    .get((req, res, next) => {
+    .options(cors.corsWithOptions, (req, res) => res.sendStatus = 200)
+    .get(cors.cors, (req, res, next) => {
         Promotions.find({})
             .then((promotions) => {
                 res.statusCode = 200;
@@ -16,7 +18,7 @@ promotionRouter.route('/')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
             Promotions.create(req.body)
                 .then((promotion) => {
@@ -30,11 +32,11 @@ promotionRouter.route('/')
             res.send('Only admins can adjust this page');
         }
     })
-    .put(authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('Put operation does not make sense');
     })
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
             Promotions.remove({})
                 .then((resp) => {
@@ -50,7 +52,8 @@ promotionRouter.route('/')
 
 
 promotionRouter.route('/:id')                   // DAVOMIGA YOZING!
-    .get((req, res, next) => {
+    .options(cors.corsWithOptions, (req, res) => res.sendStatus = 200)
+    .get(cors.cors, (req, res, next) => {
         Promotions.findById(req.params.id)
             .then((promotion) => {
                 res.statusCode = 200;
@@ -59,12 +62,12 @@ promotionRouter.route('/:id')                   // DAVOMIGA YOZING!
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('Post operation does not make sense'
             + req.params.id);
     })
-    .put(authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
             Promotions.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
                 .then((promotion) => {
@@ -78,7 +81,7 @@ promotionRouter.route('/:id')                   // DAVOMIGA YOZING!
         }
 
     })
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
             Promotions.findByIdAndRemove(req.params.id)
                 .then((resp) => {

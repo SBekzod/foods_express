@@ -6,12 +6,13 @@ var logger = require('morgan');
 var passport = require('passport');
 var config = require('./config');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var dishRouter = require('./routes/dishRouter');
-var leadersRouter = require('./routes/leadersRouter');
-var promotionRouter = require('./routes/promoRouter');
-var uploadRouter = require('./routes/uploadRouter');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const dishRouter = require('./routes/dishRouter');
+const leadersRouter = require('./routes/leadersRouter');
+const promotionRouter = require('./routes/promoRouter');
+const uploadRouter = require('./routes/uploadRouter');
+const commentRouter = require('./routes/commentRouter'); 
 
 const mongoose = require('mongoose');
 const url = config.mongoUrl;
@@ -50,6 +51,7 @@ app.use('/dishes', dishRouter);
 app.use('/promotions', promotionRouter);
 app.use('/leaders', leadersRouter);
 app.use('/imageUpload', uploadRouter);
+app.use('/comments', commentRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {                                  //?

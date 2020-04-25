@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 var authenticate = require('../authenticate');
+const cors = require('./cors');
 
 const Leaders = require('../models/leaders');
 
@@ -8,7 +9,8 @@ const leadersRouter = express.Router();
 leadersRouter.use(bodyParser.json());
 
 leadersRouter.route('/')
-    .get((req, res, next) => {
+    .options(cors.corsWithOptions, (req, res) => res.sendStatus = 200)
+    .get(cors.cors, (req, res, next) => {
         Leaders.find({})
             .then((leaders) => {
                 res.statusCode = 200;
@@ -17,7 +19,7 @@ leadersRouter.route('/')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
             Leaders.create(req.body)
                 .then((leader) => {
@@ -32,11 +34,11 @@ leadersRouter.route('/')
         }
 
     })
-    .put(authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('Put operation does not make sense');
     })
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
             Leaders.remove({})
                 .then((resp) => {
@@ -53,6 +55,7 @@ leadersRouter.route('/')
 
 
 leadersRouter.route('/:id')                   // DAVOMIGA YOZING!
+    .options(cors.corsWithOptions, (req, res) => res.sendStatus = 200)
     .get((req, res, next) => {
         Leaders.findById(req.params.id)
             .then((leader) => {

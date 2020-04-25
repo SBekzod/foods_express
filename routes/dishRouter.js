@@ -1,14 +1,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 var authenticate = require('../authenticate');
+const cors = require('./cors');
 
 const Dishes = require('../models/dishes');
 
 const dishRouter = express.Router();
 dishRouter.use(bodyParser.json());
 
-dishRouter.route('/') 
-    .get((req, res, next) => {
+dishRouter.route('/')
+    .options(cors.corsWithOptions, (req, res) => res.sendStatus = 200)
+    .get(cors.cors, (req, res, next) => {
         Dishes.find({})
             .then((dishes) => {
                 res.statusCode = 200;
@@ -17,11 +19,11 @@ dishRouter.route('/')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .put(authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('Put operation does not make sense');
     })
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
             Dishes.create(req.body)
                 .then((dish) => {
@@ -35,7 +37,7 @@ dishRouter.route('/')
             res.send('Only admins can adjust this page');
         }
     })
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
             Dishes.remove({})
                 .then((resp) => {
@@ -51,7 +53,8 @@ dishRouter.route('/')
 
 
 dishRouter.route('/:id')                   // DAVOMIGA YOZING!
-    .get((req, res, next) => {
+    .options(cors.corsWithOptions, (req, res) => res.sendStatus = 200)
+    .get(cors.cors, (req, res, next) => {
         Dishes.findById(req.params.id)
             .then((dish) => {
                 res.statusCode = 200;
@@ -60,12 +63,12 @@ dishRouter.route('/:id')                   // DAVOMIGA YOZING!
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('Post operation does not make sense'
             + req.params.id);
     })
-    .put(authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
             Dishes.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
                 .then((dish) => {
@@ -78,7 +81,7 @@ dishRouter.route('/:id')                   // DAVOMIGA YOZING!
             res.send('Only admins can adjust this page');
         }
     })
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
             Dishes.findByIdAndRemove(req.params.id)
                 .then((resp) => {
@@ -96,7 +99,8 @@ dishRouter.route('/:id')                   // DAVOMIGA YOZING!
 
 
 dishRouter.route('/:dishId/comments')
-    .get((req, res, next) => {
+    .options(cors.corsWithOptions, (req, res) => res.sendStatus = 200)
+    .get(cors.cors, (req, res, next) => {
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null) {
@@ -112,7 +116,7 @@ dishRouter.route('/:dishId/comments')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .post(authenticate.verifyUser, (req, res, next) => {                    /// Any user can Post
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {                    /// Any user can Post
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null) {
@@ -132,12 +136,12 @@ dishRouter.route('/:dishId/comments')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .put(authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('PUT operation not supported on /dishes/'
             + req.params.dishId + '/comments');
     })
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
             Dishes.findById(req.params.dishId)
                 .then((dish) => {
@@ -166,7 +170,8 @@ dishRouter.route('/:dishId/comments')
     });
 
 dishRouter.route('/:dishId/comments/:commentId')
-    .get((req, res, next) => {
+    .options(cors.corsWithOptions, (req, res) => res.sendStatus = 200)
+    .get(cors.cors, (req, res, next) => {
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null && dish.comments.id(req.params.commentId) != null) {
@@ -187,12 +192,12 @@ dishRouter.route('/:dishId/comments/:commentId')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
         res.end('POST operation not supported on /dishes/' + req.params.dishId
             + '/comments/' + req.params.commentId);
     })
-    .put(authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null && dish.comments.id(req.params.commentId) != null
@@ -226,7 +231,7 @@ dishRouter.route('/:dishId/comments/:commentId')
             }, (err) => next(err))
             .catch((err) => next(err));
     })
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null && dish.comments.id(req.params.commentId) != null
