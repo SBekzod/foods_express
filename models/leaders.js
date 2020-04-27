@@ -21,6 +21,4 @@ const LeaderSchema = new Schema({
     }
 }, {timestamps: true});
 
-var Leaders = mongoose.model('Leader', LeaderSchema);
-
-module.exports = Leaders;
+module.exports = mongoose.model('Leader', LeaderSchema);

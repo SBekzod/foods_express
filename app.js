@@ -7,12 +7,13 @@ var passport = require('passport');
 var config = require('./config');
 
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
+const usersRouter = require('./routes/userRouter');
 const dishRouter = require('./routes/dishRouter');
 const leadersRouter = require('./routes/leadersRouter');
 const promotionRouter = require('./routes/promoRouter');
 const uploadRouter = require('./routes/uploadRouter');
-const commentRouter = require('./routes/commentRouter'); 
+const commentRouter = require('./routes/ucommentRouter'); 
+const dishCommentsRouter = require('./routes/dishComment');
 
 const mongoose = require('mongoose');
 const url = config.mongoUrl;
@@ -52,6 +53,7 @@ app.use('/promotions', promotionRouter);
 app.use('/leaders', leadersRouter);
 app.use('/imageUpload', uploadRouter);
 app.use('/comments', commentRouter);
+app.use('/dishcomments', dishCommentsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {                                  //?

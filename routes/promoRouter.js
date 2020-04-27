@@ -3,24 +3,24 @@ const bodyParser = require('body-parser');
 var authenticate = require('../authenticate');
 const cors = require('./cors');
 
-const Promotions = require('../models/promotions');
+const PromotionsModel = require('../models/promotions');
 
 const promotionRouter = express.Router();
 promotionRouter.use(bodyParser.json());
 promotionRouter.route('/')
     .options(cors.corsWithOptions, (req, res) => res.sendStatus = 200)
     .get(cors.cors, (req, res, next) => {
-        Promotions.find({})
-            .then((promotions) => {
+        PromotionsModel.find({})
+            .then((PromotionsModel) => {
                 res.statusCode = 200;
                 res.setHeader('Content-type', 'application/json');
-                res.json(promotions);
+                res.json(PromotionsModel);
             }, (err) => next(err))
             .catch((err) => next(err));
     })
     .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
-            Promotions.create(req.body)
+            PromotionsModel.create(req.body)
                 .then((promotion) => {
                     console.log('Promotion created', promotion);
                     res.statusCode = 200;
@@ -38,7 +38,7 @@ promotionRouter.route('/')
     })
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
-            Promotions.remove({})
+            PromotionsModel.remove({})
                 .then((resp) => {
                     res.statusCode = 200;
                     res.setHeader('Content-type', 'application/json');
@@ -54,7 +54,7 @@ promotionRouter.route('/')
 promotionRouter.route('/:id')                   // DAVOMIGA YOZING!
     .options(cors.corsWithOptions, (req, res) => res.sendStatus = 200)
     .get(cors.cors, (req, res, next) => {
-        Promotions.findById(req.params.id)
+        PromotionsModel.findById(req.params.id)
             .then((promotion) => {
                 res.statusCode = 200;
                 res.setHeader('Content-type', 'application/json');
@@ -69,7 +69,7 @@ promotionRouter.route('/:id')                   // DAVOMIGA YOZING!
     })
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
-            Promotions.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
+            PromotionsModel.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
                 .then((promotion) => {
                     res.statusCode = 200;
                     res.setHeader('Content-type', 'application/json');
@@ -83,7 +83,7 @@ promotionRouter.route('/:id')                   // DAVOMIGA YOZING!
     })
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         if (req.user.admin === true) {
-            Promotions.findByIdAndRemove(req.params.id)
+            PromotionsModel.findByIdAndRemove(req.params.id)
                 .then((resp) => {
                     res.statusCode = 200;
                     res.setHeader('Content-type', 'application/json');

@@ -4,14 +4,16 @@ var passport = require('passport');
 var authenticate = require('../authenticate');
 const cors = require('./cors');
 
-const User = require('../models/user');
+const UsersModel = require('../models/user');
 
-var router = express.Router();
-router.use(bodyParser.json());
+var userRouter = express.Router();
+userRouter.use(bodyParser.json());
 
-router.get('/', cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+userRouter.options('*', cors.corsWithOptions, (req, res) => res.status = 200);
+
+userRouter.get('/', cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
   if (req.user.admin === true) {
-    User.find({})
+    UsersModel.find({})
       .then((users) => {
         res.statusCode = 200;
         res.setHeader('Content-type', 'application/json');
@@ -23,8 +25,8 @@ router.get('/', cors.corsWithOptions, authenticate.verifyUser, (req, res, next) 
   }
 });
 
-router.post('/signup', cors.corsWithOptions, (req, res, next) => {
-  User.register(new User({ username: req.body.username }),
+userRouter.post('/signup', cors.corsWithOptions, (req, res, next) => {
+  UsersModel.register(new UsersModel({ username: req.body.username }),
     req.body.password, (err, user) => {
       if (err) {
         res.statusCode = 500;
@@ -41,25 +43,12 @@ router.post('/signup', cors.corsWithOptions, (req, res, next) => {
     });
 });
 
-router.post('/login', cors.corsWithOptions, passport.authenticate('local'), (req, res) => {
+userRouter.post('/login', cors.corsWithOptions, passport.authenticate('local'), (req, res) => {
   var token = authenticate.getToken({ _id: req.user._id });
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
   res.json({ success: true, token: token, status: 'You are successfully logged in!' });
 });
 
-router.get('/logout', cors.corsWithOptions, (req, res, next) => {
-  if (req.session) {
-    req.session.destroy();
-    res.clearCookie('session-id');
-    res.redirect('/');
-  }
-  else {
-    var err = new Error('You are not logged in!');
-    err.status = 403;
-    next(err);
-  }
-});
 
-
-module.exports = router;
+module.exports = userRouter;
